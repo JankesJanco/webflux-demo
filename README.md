@@ -16,3 +16,6 @@ Boot 2 and Webflux.
 
 > Note: The application starts server which is listening on port 8080. Check if 
 the port is already in use by other application.
+
+> Note: The application also uses H2 SQL database which is dropped each time the
+application is stopped.

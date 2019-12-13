@@ -25,7 +25,7 @@ public class HelloConsole {
         apiClient = client;
     }
 
-    @Scheduled(fixedDelay = 10000L, initialDelay = 7000L)
+//    @Scheduled(fixedDelay = 10000L, initialDelay = 7000L)
     public void sayHelloToConsole() throws InterruptedException {
         Mono<Greeting> greetingResponse = apiClient.getHello("Miro");
 
@@ -33,6 +33,17 @@ public class HelloConsole {
         greetingResponse.subscribe(greeting -> {
             logger.info("Obtained greeting: " + greeting.getGreeting() + "\n\n");
         });
+    }
+
+    @Scheduled(fixedDelay = 10000L, initialDelay = 7000L)
+    public void sayHelloToConsoleAlternative() throws InterruptedException {
+        Mono<Greeting> greetingResponse = apiClient.getHello("Miro");
+
+        logger.info("Requesting greeting for Miro");
+        greetingResponse.map(greeting -> {
+            logger.info("Obtained greeting: " + greeting.getGreeting() + "\n\n");
+            return greeting;
+        }).block();
     }
 
     @Scheduled(fixedDelay = 10000L, initialDelay = 4000L)

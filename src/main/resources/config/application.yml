@@ -1,2 +1,23 @@
 server:
     port: 30000
+
+spring:
+        
+    datasource:
+        data-source-class-name: org.h2.jdbcx.JdbcDataSource
+        url: jdbc:h2:file:~/webfluxdemo.h2;AUTO_SERVER=TRUE
+        database-name: 
+        server-name: 
+        username: webfluxdemo
+        password: superpwd
+
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        database: H2
+        open-in-view: false
+        show_sql: false
+        generate-ddl: false
+        hibernate:
+            ddl-auto: update
+            use-new-id-generator-mappings: false
+            naming-strategy: org.hibernate.cfg.EJB3NamingStrategy

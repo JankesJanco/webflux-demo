@@ -9,6 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/**
+ * Scheduled tasks for calling Hello API and writing progress/result to console.
+ */
 @Service
 public class HelloConsole {
 
@@ -40,10 +43,12 @@ public class HelloConsole {
         Mono<Greeting> greetingResponse = apiClient.getHello("Miro");
 
         logger.info("Requesting greeting for Miro");
+        // map() method is one of possible Mono publisher transformation methods. In these specific case is map() equal
+        // to identity.
         greetingResponse.map(greeting -> {
             logger.info("Obtained greeting: " + greeting.getGreeting() + "\n\n");
             return greeting;
-        }).block();
+        }).block(); // we have to call block() method to subscribe to the publisher. Otherwise no request to Hello API will be made.
     }
 
     @Scheduled(fixedDelay = 10000L, initialDelay = 4000L)

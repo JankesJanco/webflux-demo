@@ -5,6 +5,7 @@ import cz.datera.rav.webfluxdemo.hello.RegisterUserRequest;
 import cz.datera.rav.webfluxdemo.hello.UserResponse;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -21,15 +22,17 @@ import reactor.netty.http.client.HttpClient;
 public class HelloApiClient {
 
     private final WebClient webClient;
+    
+    public HelloApiClient(WebClient.Builder builder, Environment environment) {
+        Integer apiServerPort = environment.getProperty("server.port", Integer.class, 8080);
 
-    public HelloApiClient(WebClient.Builder builder) {
         final HttpClient httpClient
                 = HttpClient.create().keepAlive(true);
 
         final ReactorClientHttpConnector connector
                 = new ReactorClientHttpConnector(httpClient);
 
-        webClient = builder.baseUrl("http://localhost:8080")
+        webClient = builder.baseUrl(String.format("http://localhost:%d", apiServerPort))
                 .clientConnector(connector)
                 .defaultHeader(
                         HttpHeaders.CONTENT_TYPE,
@@ -47,7 +50,12 @@ public class HelloApiClient {
     public Mono<UserResponse> registerUser(String name, String city) {
         return postMono("/api/v1/hello/register", null, null, new RegisterUserRequest(name, city), UserResponse.class);
     }
-    
+
+    /**
+     * Returns raw response body for request to get registered users.
+     * 
+     * @return 
+     */
     public Mono<String> getRegisteredUsersRaw() {
         return getMono("/api/v1/hello/registered-users", null, null, String.class);
     }

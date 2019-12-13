@@ -11,7 +11,7 @@ public class UserResponse {
     private String city;
     
     private Date createdAt;
-
+    
     public long getId() {
         return id;
     }

@@ -11,6 +11,15 @@ public class RegisterUserRequest {
      * City where the user lives.
      */
     private String city;
+    
+    public RegisterUserRequest() {
+        
+    }
+    
+    public RegisterUserRequest(String name, String city) {
+        this.name = name;
+        this.city = city;
+    }
 
     public String getName() {
         return name;

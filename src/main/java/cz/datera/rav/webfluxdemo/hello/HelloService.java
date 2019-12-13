@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class HelloService {
-    
+
     private final HelloUserRepository repository;
 
     private final ModelMapper mapper;
@@ -37,15 +37,15 @@ public class HelloService {
             return mapper.map(user, UserResponse.class);
         });
     }
-    
+
     public Flux<UserResponse> getRegisteredUsers() {
         return Flux.fromIterable(repository.findAll())
                 .map(dbEntity -> mapper.map(dbEntity, UserResponse.class));
     }
-    
+
     public Flux<String> greetRegisteredUsers() {
         return Flux.fromIterable(repository.findAll())
                 .map(dbEntity -> String.format("Hello %s from %s", dbEntity.getName(), dbEntity.getCity()));
-                
+
     }
 }

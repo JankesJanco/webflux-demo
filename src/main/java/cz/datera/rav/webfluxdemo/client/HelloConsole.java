@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -22,7 +23,7 @@ public class HelloConsole {
     private final Random random = new Random();
 
     private final String[] names = {"Fred", "Jane", "Miss America"};
-    private final String[] cities = {"New York", "London", "Prague"};
+    private final String[] cities = {"London", "Prague", "New York"};
 
     public HelloConsole(HelloApiClient client) {
         apiClient = client;
@@ -65,12 +66,54 @@ public class HelloConsole {
     }
 
     @Scheduled(fixedDelay = 10000L, initialDelay = 1000L)
-    public void printRegisteredUsersToConsole() {
+    public void printRegisteredUsersToConsoleRaw() {
         Mono<String> response = apiClient.getRegisteredUsersRaw();
 
         logger.info("Requesting list of registered users.");
         response.subscribe(registeredUsersRaw -> {
             logger.info("Registered users raw response: " + registeredUsersRaw + "\n");
+        });
+    }
+
+    @Scheduled(fixedDelay = 10000L, initialDelay = 1000L)
+    public void printRegisteredUsersToConsole() {
+        Flux<UserResponse> response = apiClient.getRegisteredUsers();
+
+        logger.info("Requesting list of registered users and filtering only London users.");
+        response.subscribe(userResponse -> {
+            String message = String.format("%s from %s (id=%d)", userResponse.getName(), userResponse.getCity(),
+                    userResponse.getId());
+            logger.info(message);
+        });
+    }
+
+    @Scheduled(fixedDelay = 10000L, initialDelay = 1000L)
+    public void printRegisteredUsersFromLondonToConsole1() {
+        Flux<UserResponse> response = apiClient.getRegisteredUsers();
+
+        logger.info("Requesting list of registered users and filtering only London users.");
+        response.filter(userResponse -> "London".equals(userResponse.getCity()))
+                .map(userResponse -> String.format("%s from %s (id=%d)", userResponse.getName(), userResponse.getCity(),
+                userResponse.getId()))
+                .subscribe(message -> {
+                    logger.info(message);
+                });
+    }
+
+    /**
+     * Get registered London users. Should print same results as printRegisteredUsersFromLondonToConsole1().
+     */
+    @Scheduled(fixedDelay = 10000L, initialDelay = 1000L)
+    public void printRegisteredUsersFromLondonToConsole2() {
+        Flux<UserResponse> response = apiClient.getRegisteredUsers();
+
+        logger.info("Requesting list of registered users.");
+        response.subscribe(userResponse -> {
+            if ("London".equals(userResponse.getCity())) {
+                String message = String.format("%s from %s (id=%d)", userResponse.getName(), userResponse.getCity(),
+                        userResponse.getId());
+                logger.info(message);
+            }
         });
     }
 
@@ -80,7 +123,7 @@ public class HelloConsole {
     }
 
     private String getRandomCity() {
-        int index = random.nextInt(names.length);
+        int index = random.nextInt(cities.length);
         return cities[index];
     }
 
